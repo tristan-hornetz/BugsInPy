@@ -50,7 +50,7 @@ if [[ ! -e "$work_dir/bugsinpy_run_test.sh" ]]; then
 fi
 
 if [[ ! -e "$work_dir/bugsinpy_compile_flag" ]]; then
-   echo "You have not compile this project"
+   echo "You have not compiled this project"
    exit
 fi
 
@@ -59,13 +59,26 @@ if [[ "$relevant" == "1" ]]; then
    single_test=""
 fi
 
-###Activate environment
-cd "$work_dir"
-if [ -d "env/Scripts" ]; then
-  source env/Scripts/activate
-else
-  source env/bin/activate
+
+###Read bug.info file
+buggy_commit=""
+python_version=""
+
+DONE=false
+until $DONE ;do
+read || DONE=true
+if [[ "$REPLY" == "buggy_commit_id"* ]]; then
+   buggy_commit="$(cut -d'"' -f 2 <<< $REPLY)"
+elif [[ "$REPLY" == "python_version"* ]]; then
+   python_version="$(cut -d'"' -f 2 <<< $REPLY)"
 fi
+done < "$work_dir/bugsinpy_bug.info"
+
+###Activate environment
+env_name="_bugsinpy_${python_version}_${buggy_commit}"
+pyenv activate $env_name
+
+cd "$work_dir"
 
 pytest="0"
 #read file run_test.sh
@@ -178,4 +191,4 @@ elif [ "$single_test" != "" ]; then
 fi
 
 ###Deactivate the environment
-deactivate
+pyenv deactivate

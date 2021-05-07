@@ -49,29 +49,13 @@ fi
 #   exit
 #fi
 
-###Remove environment if exist
-rm -r -f env/
 
-###Add environment
-python -m venv env
-
-###Activate environment
-if [ -d "env/Scripts" ]; then
-  source env/Scripts/activate
-else
-  check_dos2unix=$(dos2unix --version 2>&1)
-	if [ "$check_dos2unix" == *"not found"* ]; then
-	   echo "Please install dos2unix (sudo apt-get dos2unix)"
-	   exit
-	fi
-  source env/bin/activate
-  dos2unix $work_dir/bugsinpy_requirements.txt
-fi
 ###Add pythonpath
 pythonpath_set=""
 pythonpath_without_folder=""
 buggy_commit=""
 fix_commit=""
+python_version=""
 
 ###Read bug.info file
 DONE=false
@@ -84,6 +68,8 @@ elif [[ "$REPLY" == "fixed_commit_id"* ]]; then
 elif [[ "$REPLY" == "test_file"* ]]; then
    test_file_all="$(cut -d'"' -f 2 <<< $REPLY)"
    IFS=';' read -r -a test_file <<< "$test_file_all"
+elif [[ "$REPLY" == "python_version"* ]]; then
+   python_version="$(cut -d'"' -f 2 <<< $REPLY)"
 elif [[ "$REPLY" == "pythonpath"* ]]; then
    pythonpath_all="$(cut -d'"' -f 2 <<< $REPLY)"
    if [ "$pythonpath_all" != "" ]; then
@@ -104,6 +90,40 @@ elif [[ "$REPLY" == "pythonpath"* ]]; then
 fi
 done < "$work_dir/bugsinpy_bug.info"
 
+###Install required python version if not already installed
+python_installed="FALSE"
+while read -r line
+do
+  if [[ $line == "${python_version}" ]]; then
+    python_installed="TRUE"
+    echo "Python Version ${python_version} is already installed."
+    break
+  fi
+done < <(pyenv versions)
+
+if [[ $python_installed == "FALSE" ]]; then
+  pyenv install $python_version
+fi
+
+
+###Remove old environments
+while read -r line
+do
+  if [[ $line == "_bugsinpy_"* ]]; then
+    env_line=($line)
+    echo "Removing environment ${env_line[0]}..."
+    pyenv virtualenv-delete $env_line[0]
+  fi
+done < <(pyenv virtualenvs)
+
+
+###Create environment
+env_name="_bugsinpy_${python_version}_${buggy_commit}"
+echo "Creating environment ${env_name}..."
+pyenv virtualenv $python_version $env_name
+
+###Activate environment
+pyenv activate $env_name
 
 ###Read setup.sh
   run_setup_all=""
@@ -137,7 +157,7 @@ done
 if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
     cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
 fi
-deactivate
+pyenv deactivate
 
 
 ###Add pythonpath

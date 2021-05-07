@@ -72,11 +72,24 @@ if [ ! -f $bug_location/fuzz_target.py ]; then
     echo "Did not find any fuzzing script that execises the function containing the fix for this bug."
 
 else
-	if [ -d "env/Scripts" ]; then
-	  source env/Scripts/activate
-	else
-	  source env/bin/activate
-	fi
+    ###Read bug.info file
+    buggy_commit=""
+    python_version=""
+
+    DONE=false
+    until $DONE ;do
+    read || DONE=true
+    if [[ "$REPLY" == "buggy_commit_id"* ]]; then
+       buggy_commit="$(cut -d'"' -f 2 <<< $REPLY)"
+    elif [[ "$REPLY" == "python_version"* ]]; then
+       python_version="$(cut -d'"' -f 2 <<< $REPLY)"
+    fi
+    done < "$work_dir/bugsinpy_bug.info"
+
+    ###Activate environment
+    env_name="_bugsinpy_${python_version}_${buggy_commit}"
+    pyenv activate $env_name
+
 
     pip install pythonfuzz==1.0.3
 
@@ -89,5 +102,5 @@ else
 
     rm $work_dir/fuzz_target.py
 
-    deactivate
+    pyenv deactivate
 fi

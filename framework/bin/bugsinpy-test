@@ -59,6 +59,10 @@ if [[ "$relevant" == "1" ]]; then
    single_test=""
 fi
 
+###Initialize pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
 
 ###Read bug.info file
 buggy_commit=""

@@ -55,7 +55,12 @@ if [[ "$target" == "" && "$unit" == "" ]]; then
    relevant="1"
 fi  
 
-###Activate environment
+
+###Initialize pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
 ###Read bug.info file
 buggy_commit=""
 python_version=""
@@ -72,7 +77,7 @@ done < "$work_dir/bugsinpy_bug.info"
 
 ###Activate environment
 env_name="_bugsinpy_${python_version}_${buggy_commit}"
-pyenv activate $env_name
+pyenv activate "$env_name"
 
 cd "$work_dir"
 pip install mutpy

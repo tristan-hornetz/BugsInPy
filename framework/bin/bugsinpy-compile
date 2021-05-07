@@ -90,6 +90,11 @@ elif [[ "$REPLY" == "pythonpath"* ]]; then
 fi
 done < "$work_dir/bugsinpy_bug.info"
 
+###Initialize pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
 ###Install required python version if not already installed
 python_installed="FALSE"
 while read -r line
@@ -107,23 +112,25 @@ fi
 
 
 ###Remove old environments
+env_name="_bugsinpy_${python_version}_${buggy_commit}"
 while read -r line
 do
-  if [[ $line == "_bugsinpy_"* ]]; then
+  if [[ $line == "${env_name}" ]]; then
+    continue
+  elif [[ $line == "_bugsinpy_"* ]]; then
     env_line=($line)
     echo "Removing environment ${env_line[0]}..."
-    pyenv virtualenv-delete $env_line[0]
+    pyenv virtualenv-delete "${env_line[0]}"
   fi
 done < <(pyenv virtualenvs)
 
 
 ###Create environment
-env_name="_bugsinpy_${python_version}_${buggy_commit}"
 echo "Creating environment ${env_name}..."
-pyenv virtualenv $python_version $env_name
+pyenv virtualenv "$python_version" "$env_name"
 
 ###Activate environment
-pyenv activate $env_name
+pyenv activate "$env_name"
 
 ###Read setup.sh
   run_setup_all=""

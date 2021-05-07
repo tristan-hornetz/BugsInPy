@@ -62,6 +62,11 @@ rm -f "$work_dir/coverage_bugsinpy.txt"
 rm -f "$work_dir/coverage_singletest_bugsinpy.txt"
 rm -f "$work_dir/coverage_alltest_bugsinpy.txt"
 
+###Initialize pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+
 ###Read bug.info file
 buggy_commit=""
 python_version=""
@@ -78,7 +83,7 @@ done < "$work_dir/bugsinpy_bug.info"
 
 ###Activate environment
 env_name="_bugsinpy_${python_version}_${buggy_commit}"
-pyenv activate $env_name
+pyenv activate "$env_name"
 
 cd "$work_dir"
 pip install coverage

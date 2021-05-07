@@ -115,12 +115,12 @@ fi
 env_name="_bugsinpy_${python_version}_${buggy_commit}"
 while read -r line
 do
-  if [[ $line == "${env_name}" ]]; then
+  if [[ $line == "${env_name}"* ]]; then
     continue
   elif [[ $line == "_bugsinpy_"* ]]; then
     env_line=($line)
     echo "Removing environment ${env_line[0]}..."
-    pyenv virtualenv-delete "${env_line[0]}"
+    pyenv virtualenv-delete -f "${env_line[0]}"
   fi
 done < <(pyenv virtualenvs)
 

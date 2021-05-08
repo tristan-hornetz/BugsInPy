@@ -196,7 +196,8 @@ echo "$patch_fix_all" > "$work_dir/$project_name/bugsinpy_patchfile.info"
 
 ###Move information about bug to clone project folder
 cp -f "$project_location/bugs/$bug_id/bug.info" "$work_dir/$project_name/bugsinpy_bug.info"
-cp -f "$project_location/bugs/$bug_id/requirements.txt" "$work_dir/$project_name/bugsinpy_requirements.txt"
+#cp -f "$project_location/bugs/$bug_id/requirements.txt" "$work_dir/$project_name/bugsinpy_requirements.txt"
+tr -cd '\11\12\15\40-\176' < "$project_location/bugs/$bug_id/requirements.txt" > "$work_dir/$project_name/bugsinpy_requirements.txt"
 cp -f "$project_location/bugs/$bug_id/run_test.sh" "$work_dir/$project_name/bugsinpy_run_test.sh"
 rm -f "$work_dir/$project_name/bugsinpy_setup.sh"
 rm -f "$work_dir/$project_name/bugsinpy_compile_flag"

@@ -58,11 +58,4 @@ wrap_class = WrapClass()
 
 
 def pytest_runtest_call(item):
-    def pytest_wrapper(func):
-        def patched(*args, **kwargs):
-            with wrap_class(repr(func)):
-                func(*args, **kwargs)
-
-        return patched
-
     item.obj = pytest_wrapper(item.obj)

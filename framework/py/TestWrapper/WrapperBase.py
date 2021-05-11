@@ -11,7 +11,7 @@ class TestCase(TestCase):
         func = getattr(self, name)
 
         def patched(*args, **kwargs):
-            with wrap_class(name=name):
+            with wrap_class(name):
                 return func()
 
         setattr(self, name, types.MethodType(patched, self))
@@ -49,6 +49,9 @@ class WrapClass:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         print("Leaving {a}!".format(a=self.name))
+        if exc_val is not None:
+            print(exc_type)
+            os.system('echo "{err}" >> errs.txt'.format(err=str(exc_type) + "\n" + str(exc_val)))
 
 
 wrap_class = WrapClass()

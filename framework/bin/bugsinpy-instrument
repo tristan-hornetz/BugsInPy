@@ -1,8 +1,12 @@
 #!/bin/bash
-usage="-w work_dir
+usage="
+      -w work_dir
              The working directory to compile the project. Default will be the current directory.
+      -f force
+             Force the instrumentation, even if the project was already instrumented.
 "
 
+force="0"
 case $1 in
  -[h?] | --help)
     cat <<-____HALP
@@ -10,6 +14,7 @@ case $1 in
         $usage
 ____HALP
         exit 0;;
+ -f) force="1";;
 esac
 
 ###Read the flag of checkout
@@ -49,8 +54,12 @@ if [[ ! -e "$work_dir/bugsinpy_compile_flag" ]]; then
    exit
 fi
 if [[ -e "$work_dir/bugsinpy_instrument_flag" ]]; then
+  if [[ $force != "1" ]]; then
    echo "You have already instrumented this project"
    exit
+  else
+    echo "Forcing instrumentation..."
+  fi
 fi
 
 ### Create Symlink to Instrumentation source
@@ -87,9 +96,20 @@ if [[ $pytest == "1" ]]; then
       fi
     fi
   done < <(du -a | grep ".*/test_.*py$\|.*_test.py$\|.*/conftest.py$")
-  echo "1" > "$work_dir/bugsinpy_instrument_flag"
+else
+  echo "Python Unittest detected"
+  ### Instrument test files
+  while read -r line
+  do
+    line_arr=($line)
+    test_path="${line_arr[1]}"
+    wrapper_inport=""
+    sed -i '/.*import.* unittest/a\import TestWrapper.WrapperBase as unittest' "${test_path}"
+    echo "Instrumented ${test_path}"
+  done < <(du -a | grep ".*/test_.*py$\|.*_test.py$")
 fi
 
+echo "1" > "$work_dir/bugsinpy_instrument_flag"
 
 
 

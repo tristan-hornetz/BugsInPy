@@ -64,6 +64,7 @@ fi
 
 ### Create Symlink to Instrumentation source
 ln -s "${framework_location}/../py/TestWrapper" "${work_dir}/TestWrapper"
+echo "Created Symlink ${work_dir}/TestWrapper -> ${framework_location}/../py/TestWrapper"
 
 pytest="0"
 #read file run_test.sh
@@ -93,6 +94,10 @@ if [[ $pytest == "1" ]]; then
       if [ ! -f "$dname/conftest.py" ]; then
         echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_call\n' >> "$dname/conftest.py"
         echo "Instrumented ${dname}/conftest.py"
+      fi
+      if [ ! -d "$dname/TestWrapper" ]; then
+        ln -s "${framework_location}/../py/TestWrapper" "${dname}/TestWrapper"
+        echo "Created Symlink ${dname}/TestWrapper -> ${framework_location}/../py/TestWrapper"
       fi
     fi
   done < <(du -a | grep ".*/test_.*py$\|.*_test.py$\|.*/conftest.py$")

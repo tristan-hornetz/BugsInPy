@@ -106,7 +106,7 @@ else
     wrapper_inport=""
     sed -i '/.*import.* unittest/a\import TestWrapper.WrapperBase as unittest' "${test_path}"
     echo "Instrumented ${test_path}"
-  done < <(du -a | grep ".*/test_.*py$\|.*_test.py$")
+  done < <(du -a | grep ".*\.py$")
 fi
 
 echo "1" > "$work_dir/bugsinpy_instrument_flag"

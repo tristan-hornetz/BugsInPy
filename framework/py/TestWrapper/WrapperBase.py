@@ -1,9 +1,11 @@
+import inspect
 import os
 import types
 from unittest import *
-from unittest import mock
 
-mock = mock
+from WrapClass import WrapClass
+
+wrap_class = WrapClass
 
 
 class TestCase(TestCase):
@@ -27,35 +29,11 @@ class TestCase(TestCase):
 
 def pytest_wrapper(func):
     def patched(*args, **kwargs):
-        with wrap_class(repr(func)):
+        with wrap_class(os.path.abspath(inspect.getfile(func)) + "::" + func.__name__):
             func(*args, **kwargs)
-
     return patched
 
 
-class WrapClass:
-    def __init__(self, name="method"):
-        self.name = name
-        self.calls = 0
-
-    def __call__(self, *args, **kwargs):
-        self.calls += 1
-        os.system('echo "{num}" > nums.txt'.format(num=self.calls))
-        return WrapClass(str(args[0] if len(args) > 0 else "method"))
-
-    def __enter__(self):
-        # print("Entering {a}!".format(a=self.name))
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        print("Leaving {a}!".format(a=self.name))
-        if exc_val is not None:
-            print(exc_type)
-            os.system('echo "{err}" >> errs.txt'.format(err=str(exc_type) + "\n" + str(exc_val)))
-
-
-wrap_class = WrapClass()
-
-
-def pytest_runtest_call(item):
-    item.obj = pytest_wrapper(item.obj)
+def pytest_runtest_setup(item):
+    if item.obj.__name__ != "patched":
+        item.obj = pytest_wrapper(item.obj)

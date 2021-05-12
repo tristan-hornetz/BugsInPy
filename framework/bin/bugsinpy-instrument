@@ -2,11 +2,16 @@
 usage="
       -w work_dir
              The working directory to compile the project. Default will be the current directory.
+      -c wrapper_class
+             The file containing the desired instrumentation class, which must be named WrapClass. The class needs to define __enter__ and __exit__ functions.
       -f force
              Force the instrumentation, even if the project was already instrumented.
 "
 
 force="0"
+work_dir=""
+wrapper_class=""
+
 case $1 in
  -[h?] | --help)
     cat <<-____HALP
@@ -18,10 +23,11 @@ ____HALP
 esac
 
 ###Read the flag of checkout
-while getopts p:i:v:w: flag
+while getopts c:w: flag
 do
     case "${flag}" in
         w) work_dir=${OPTARG};;
+        c) wrapper_class=${OPTARG};;
     esac
 done
 
@@ -35,6 +41,12 @@ fi
 if [[ $work_dir == */ ]]; then
    temp_work_dir="$work_dir"
    work_dir=${temp_work_dir::-1}
+fi
+
+### Update the wrapper class location
+
+if [ "$wrapper_class" == "" ]; then
+   wrapper_class="$work_dir/TestWrapper/DefaultWrapperClass.py"
 fi
 
 ###Check work directory
@@ -62,9 +74,13 @@ if [[ -e "$work_dir/bugsinpy_instrument_flag" ]]; then
   fi
 fi
 
-### Create Symlink to Instrumentation source
+### Create Symlink to Instrumentation sources
 ln -s "${framework_location}/../py/TestWrapper" "${work_dir}/TestWrapper"
 echo "Created Symlink ${work_dir}/TestWrapper -> ${framework_location}/../py/TestWrapper"
+
+wrapper_class="$(readlink -f "$(dirname "${wrapper_class}")")/$(basename "${wrapper_class}")"
+ln -s "${wrapper_class}" "${work_dir}/WrapClass.py"
+echo "Created Symlink ${work_dir}/WrapClass.py -> ${wrapper_class}"
 
 pytest="0"
 #read file run_test.sh
@@ -87,17 +103,19 @@ if [[ $pytest == "1" ]]; then
   do
     line_arr=($line)
     if [[ $line == *"/conftest.py" ]]; then
-      echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_call\n' >> "${line_arr[1]}"
+      echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_setup\n' >> "${line_arr[1]}"
       echo "Instrumented ${line_arr[1]}"
     else
       dname=$(dirname "${line_arr[1]}")
       if [ ! -f "$dname/conftest.py" ]; then
-        echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_call\n' >> "$dname/conftest.py"
-        echo "Instrumented ${dname}/conftest.py"
+        echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_setup\n' >> "$dname/conftest.py"
+        echo "Created ${dname}/conftest.py"
       fi
-      if [ ! -d "$dname/TestWrapper" ]; then
+      if [ ! -L "$dname/TestWrapper" ]; then
         ln -s "${framework_location}/../py/TestWrapper" "${dname}/TestWrapper"
         echo "Created Symlink ${dname}/TestWrapper -> ${framework_location}/../py/TestWrapper"
+        ln -s "${wrapper_class}" "${dname}/WrapClass.py"
+        echo "Created Symlink ${dname}/WrapClass.py -> ${wrapper_class}"
       fi
     fi
   done < <(du -a | grep ".*/test_.*py$\|.*_test.py$\|.*/conftest.py$")
@@ -108,7 +126,6 @@ else
   do
     line_arr=($line)
     test_path="${line_arr[1]}"
-    wrapper_inport=""
     sed -i '/.*import.* unittest/a\import TestWrapper.WrapperBase as unittest' "${test_path}"
     echo "Instrumented ${test_path}"
   done < <(du -a | grep ".*\.py$")

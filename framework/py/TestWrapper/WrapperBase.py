@@ -5,7 +5,7 @@ from unittest import *
 from WrapClass import debugger, test_id, dump_file
 
 
-def pytest_wrapper(func, collect_fail=True, item="", test_item=""):
+def pytest_wrapper(func, collect_fail=True):
     def patched(*args, **kwargs):
         collector = debugger.collector_class()
         try:
@@ -13,7 +13,7 @@ def pytest_wrapper(func, collect_fail=True, item="", test_item=""):
                 func(*args, **kwargs)
             debugger.add_collector(debugger.PASS, collector)
         except Exception as e:
-            if not (collect_fail or str(item) == str(test_item)):
+            if not collect_fail:
                 raise e
             debugger.add_collector(debugger.FAIL, collector)
             ranking = debugger.rank()
@@ -44,4 +44,4 @@ class TestCase(TestCase):
 
 def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
-        item.obj = pytest_wrapper(item.obj, False, item.nodeid.split("[")[0], test_id)
+        item.obj = pytest_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)

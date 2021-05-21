@@ -131,7 +131,7 @@ elif [[ "$run_all" == "1" ]]; then
   if [[ "$pytest" == "1" ]]; then
      res_first=$(pytest --continue-on-collection-errors 2>&1)
      echo "$res_first"
-     echo "pytest --continue-on-collection-errors" &>>"$work_dir/bugsinpy_alltest.txt"
+     echo "pytest --continue-on-collection-errors --ignore-glob=*/root/*" &>>"$work_dir/bugsinpy_alltest.txt"
      echo "$res_first" &>>"$work_dir/bugsinpy_alltest.txt"
   else
      echo "Run Unittest" 

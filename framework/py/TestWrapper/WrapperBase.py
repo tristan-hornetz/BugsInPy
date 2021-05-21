@@ -1,22 +1,37 @@
-import inspect
 import os
 import types
 from unittest import *
 
-from WrapClass import WrapClass
+from WrapClass import debugger, test_id, dump_file
 
-wrap_class = WrapClass
+
+def pytest_wrapper(func, collect_fail=True, item="", test_item=""):
+    def patched(*args, **kwargs):
+        collector = debugger.collector_class()
+        try:
+            with collector:
+                func(*args, **kwargs)
+            debugger.add_collector(debugger.PASS, collector)
+        except Exception as e:
+            if not (collect_fail or str(item) == str(test_item)):
+                raise e
+            debugger.add_collector(debugger.FAIL, collector)
+            ranking = debugger.rank()
+            if dump_file != "":
+                if os.path.isfile(dump_file):
+                    os.remove(dump_file)
+                with open(dump_file, "x") as f:
+                    f.write(str(ranking))
+            raise e
+    setattr(patched, "patched_flag", True)
+    return patched
 
 
 class TestCase(TestCase):
     def add_wrapper(self, name):
         func = getattr(self, name)
-
-        def patched(*args, **kwargs):
-            with wrap_class(name):
-                return func()
-
-        setattr(self, name, types.MethodType(patched, self))
+        if not hasattr(func, "patched_flag"):
+            setattr(self, name, types.MethodType(pytest_wrapper(func), self))
 
     def __init__(self, *args, **kwargs):
         reference = super()
@@ -27,13 +42,6 @@ class TestCase(TestCase):
         super().__init__(*args, **kwargs)
 
 
-def pytest_wrapper(func):
-    def patched(*args, **kwargs):
-        with wrap_class(os.path.abspath(inspect.getfile(func)) + "::" + func.__name__):
-            func(*args, **kwargs)
-    return patched
-
-
 def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
-        item.obj = pytest_wrapper(item.obj)
+        item.obj = pytest_wrapper(item.obj, False, item.nodeid.split("[")[0], test_id)

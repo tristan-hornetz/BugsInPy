@@ -1,8 +1,7 @@
-import os
 import types
 from unittest import *
 
-from WrapClass import debugger, test_id, dump_file
+from WrapClass import debugger, test_id
 
 def pytest_wrapper(func, collect_fail=True):
     def patched(*args, **kwargs):

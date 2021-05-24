@@ -3,12 +3,13 @@ import os
 
 class RankDumper:
     def __del__(self):
-        ranking = self.rank() if hasattr(self, "rank") else []
-        if dump_file != "" and len(ranking) > 0:
-            if os.path.isfile(dump_file):
-                os.remove(dump_file)
-            with open(dump_file, "x") as f:
-                f.write(str(ranking))
+        if hasattr(self, "dump_file") and hasattr(self, "rank"):
+            ranking = self.rank()
+            if self.dump_file != "" and len(ranking) > 0:
+                if os.path.isfile(self.dump_file):
+                    os.remove(self.dump_file)
+                with open(self.dump_file, "x") as f:
+                    f.write(str(ranking))
 
 
 class DefaultWrapperClass(RankDumper):
@@ -26,8 +27,10 @@ class DefaultWrapperClass(RankDumper):
 
         def _pass(*args, **kwargs):
             pass
+
         self.add_collector = _pass
         self.rank = _pass
+        self.dump_file = ""
 
     def __enter__(self):
         pass
@@ -38,4 +41,3 @@ class DefaultWrapperClass(RankDumper):
 
 debugger = DefaultWrapperClass()
 test_id = ""
-dump_file = ""

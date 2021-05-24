@@ -4,7 +4,6 @@ from unittest import *
 
 from WrapClass import debugger, test_id, dump_file
 
-
 def pytest_wrapper(func, collect_fail=True):
     def patched(*args, **kwargs):
         collector = debugger.collector_class()
@@ -13,16 +12,10 @@ def pytest_wrapper(func, collect_fail=True):
                 func(*args, **kwargs)
             debugger.add_collector(debugger.PASS, collector)
         except Exception as e:
-            if not collect_fail:
-                raise e
-            debugger.add_collector(debugger.FAIL, collector)
-            ranking = debugger.rank()
-            if dump_file != "":
-                if os.path.isfile(dump_file):
-                    os.remove(dump_file)
-                with open(dump_file, "x") as f:
-                    f.write(str(ranking))
+            if collect_fail:
+                debugger.add_collector(debugger.FAIL, collector)
             raise e
+
     setattr(patched, "patched_flag", True)
     return patched
 

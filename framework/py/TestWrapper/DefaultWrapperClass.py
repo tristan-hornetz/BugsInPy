@@ -1,4 +1,17 @@
-class DefaultWrapperClass:
+import os
+
+
+class RankDumper:
+    def __del__(self):
+        ranking = self.rank() if hasattr(self, "rank") else []
+        if dump_file != "" and len(ranking) > 0:
+            if os.path.isfile(dump_file):
+                os.remove(dump_file)
+            with open(dump_file, "x") as f:
+                f.write(str(ranking))
+
+
+class DefaultWrapperClass(RankDumper):
     def __call__(self, *args, **kwargs):
         self.calls += 1
         return DefaultWrapperClass(str(args[0] if len(args) > 0 else "method") if "name" not in kwargs.keys() else

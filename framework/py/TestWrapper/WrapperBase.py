@@ -37,3 +37,6 @@ class TestCase(TestCase):
 def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
         item.obj = pytest_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)
+
+def pytest_sessionfinish(session, exitstatus):
+    debugger.teardown()

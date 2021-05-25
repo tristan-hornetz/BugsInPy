@@ -30,6 +30,7 @@ class DefaultWrapperClass(RankDumper):
 
         self.add_collector = _pass
         self.rank = _pass
+        self.teardown = _pass
         self.dump_file = ""
 
     def __enter__(self):

@@ -112,10 +112,12 @@ fi
 
 
 ###Remove old environments
+env_present="0"
 env_name="_bugsinpy_${python_version}_${buggy_commit}"
 while read -r line
 do
   if [[ $line == "${env_name}"* ]]; then
+    env_present="1"
     continue
   elif [[ $line == "_bugsinpy_"* ]]; then
     env_line=($line)
@@ -124,15 +126,15 @@ do
   fi
 done < <(pyenv virtualenvs)
 
+if [[ $env_present == "0" ]]; then
+  ###Create environment
+  echo "Creating environment ${env_name}..."
+  pyenv virtualenv "$python_version" "$env_name"
 
-###Create environment
-echo "Creating environment ${env_name}..."
-pyenv virtualenv "$python_version" "$env_name"
+  ###Activate environment
+  pyenv activate "$env_name"
 
-###Activate environment
-pyenv activate "$env_name"
-
-###Read setup.sh
+  ###Read setup.sh
   run_setup_all=""
   if [[ -f "$work_dir/bugsinpy_setup.sh" ]]; then
     DONE=false
@@ -142,7 +144,10 @@ pyenv activate "$env_name"
        echo $REPLY
     done < "$work_dir/bugsinpy_setup.sh"
   fi
-  
+else
+  ###Activate environment
+  pyenv activate "$env_name"
+fi
   IFS=';' read -r -a run_setup <<< "$run_setup_all"
 
 ###Run setup.sh

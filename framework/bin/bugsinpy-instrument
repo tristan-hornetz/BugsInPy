@@ -126,7 +126,8 @@ else
   do
     line_arr=($line)
     test_path="${line_arr[1]}"
-    sed -i '/.*import.* unittest/a\import TestWrapper.WrapperBase as unittest' "${test_path}"
+    sed -i '/import.* unittest/a\import TestWrapper.WrapperBase as unittest' "${test_path}"
+    sed -i '/from .*unittest.* import .*/a\from TestWrapper.WrapperBase import *' "${test_path}"
     echo "Instrumented ${test_path}"
   done < <(du -a | grep ".*\.py$")
 fi

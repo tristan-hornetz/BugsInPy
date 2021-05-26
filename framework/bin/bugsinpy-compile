@@ -126,29 +126,26 @@ do
   fi
 done < <(pyenv virtualenvs)
 
+
 if [[ $env_present == "0" ]]; then
   ###Create environment
   echo "Creating environment ${env_name}..."
   pyenv virtualenv "$python_version" "$env_name"
-
-  ###Activate environment
-  pyenv activate "$env_name"
-
-  ###Read setup.sh
-  run_setup_all=""
-  if [[ -f "$work_dir/bugsinpy_setup.sh" ]]; then
-    DONE=false
-    until $DONE ;do
-    read || DONE=true
-       run_setup_all+="$REPLY;"
-       echo $REPLY
-    done < "$work_dir/bugsinpy_setup.sh"
-  fi
-else
-  ###Activate environment
-  pyenv activate "$env_name"
 fi
-  IFS=';' read -r -a run_setup <<< "$run_setup_all"
+###Activate environment
+pyenv activate "$env_name"
+
+###Read setup.sh
+run_setup_all=""
+if [[ -f "$work_dir/bugsinpy_setup.sh" ]]; then
+  DONE=false
+  until $DONE ;do
+  read || DONE=true
+     run_setup_all+="$REPLY;"
+     echo $REPLY
+  done < "$work_dir/bugsinpy_setup.sh"
+fi
+IFS=';' read -r -a run_setup <<< "$run_setup_all"
 
 ###Run setup.sh
 #dos2unix $work_dir/bugsinpy_requirements.txt
@@ -163,11 +160,13 @@ do
    run_setup_now=$(echo $run_setup_trail | sed -e 's/\r//g')
    $run_setup_now
 done
-  
-###Install requirement
-#pip install -r "$work_dir/bugsinpy_requirements.txt"
-if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
-    cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
+
+if [[ $env_present == "0" ]]; then
+  ###Install requirement
+  #pip install -r "$work_dir/bugsinpy_requirements.txt"
+  if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
+      cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
+  fi
 fi
 pyenv deactivate
 

@@ -21,6 +21,22 @@ def pytest_wrapper(func, collect_fail=True):
     return patched
 
 
+def unittest_wrapper(func, collect_fail=True):
+    def patched(*args, **kwargs):
+        collector = debugger.collector_class()
+        try:
+            with collector:
+                func()
+            debugger.add_collector(debugger.PASS, collector)
+        except Exception as e:
+            if collect_fail:
+                debugger.add_collector(debugger.FAIL, collector)
+            raise e
+
+    setattr(patched, "patched_flag", True)
+    return patched
+
+
 class TestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
@@ -29,7 +45,7 @@ class TestCase(TestCase):
     def add_wrapper(self, name):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
-            setattr(self, name, types.MethodType(pytest_wrapper(func), self))
+            setattr(self, name, types.MethodType(unittest_wrapper(func), self))
 
     def __init__(self, *args, **kwargs):
         reference = super()

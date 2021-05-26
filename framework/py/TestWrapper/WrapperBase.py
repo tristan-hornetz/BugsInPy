@@ -1,7 +1,9 @@
 import types
 from unittest import *
+import unittest.runner
 
 from WrapClass import debugger, test_id
+
 
 def pytest_wrapper(func, collect_fail=True):
     def patched(*args, **kwargs):
@@ -20,6 +22,10 @@ def pytest_wrapper(func, collect_fail=True):
 
 
 class TestCase(TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        debugger.teardown()
+
     def add_wrapper(self, name):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
@@ -38,5 +44,7 @@ def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
         item.obj = pytest_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)
 
+
 def pytest_sessionfinish(session, exitstatus):
     debugger.teardown()
+

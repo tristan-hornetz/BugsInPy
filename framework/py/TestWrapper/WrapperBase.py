@@ -54,13 +54,15 @@ class TestCase(TestCase):
             ref_name = f"{func.__module__}.{self.__class__.__name__}.{func.__name__}"
             setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name), False), self))
 
-    def __init__(self, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls)
+        self = obj
         reference = super()
         for name in dir(self):
             if name.startswith("test_") and isinstance(getattr(self, name), type(self.__init__)) and not hasattr(
                     reference, name):
                 self.add_wrapper(name)
-        super().__init__(*args, **kwargs)
+        return obj
 
 
 def pytest_runtest_setup(item):

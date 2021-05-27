@@ -52,7 +52,7 @@ class TestCase(TestCase):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
             ref_name = func.__module__ + "." + func.__name__
-            setattr(self, name, types.MethodType(test_wrapper(func, ref_name in test_id, False), self))
+            setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name), False), self))
 
     def __init__(self, *args, **kwargs):
         reference = super()

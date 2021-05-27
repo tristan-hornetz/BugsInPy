@@ -1,12 +1,11 @@
 import types
 from unittest import *
 import signal
-import os
-import errno
 
 from WrapClass import debugger, test_id
 
 TEST_TIMEOUT = 15  # seconds
+
 
 class FunctionTimeout(Exception):
     pass
@@ -33,7 +32,7 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
             return ret
         except Exception as e:
             signal.alarm(0)
-            if collect_fail:
+            if collect_fail and not isinstance(e, FunctionTimeout):
                 debugger.add_collector(debugger.FAIL, collector)
             raise e
         finally:

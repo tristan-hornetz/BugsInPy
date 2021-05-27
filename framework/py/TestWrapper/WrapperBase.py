@@ -1,6 +1,7 @@
 import types
 from unittest import *
 import signal
+import sys
 
 from WrapClass import debugger, test_id
 
@@ -50,7 +51,8 @@ class TestCase(TestCase):
     def add_wrapper(self, name):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
-            setattr(self, name, types.MethodType(test_wrapper(func, True, False), self))
+            ref_name = func.__module__ + "." + func.__name__
+            setattr(self, name, types.MethodType(test_wrapper(func, ref_name in test_id, False), self))
 
     def __init__(self, *args, **kwargs):
         reference = super()

@@ -51,7 +51,7 @@ class TestCase(TestCase):
     def add_wrapper(self, name):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
-            ref_name = func.__module__ + "." + func.__name__
+            ref_name = f"{func.__module__}.{self.__class__.__name__}.{func.__name__}"
             setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name), False), self))
 
     def __init__(self, *args, **kwargs):

@@ -1,37 +1,43 @@
 import types
 from unittest import *
-import unittest.runner
+import signal
+import os
+import errno
 
 from WrapClass import debugger, test_id
 
+TEST_TIMEOUT = 15  # seconds
 
-def pytest_wrapper(func, collect_fail=True):
+class FunctionTimeout(Exception):
+    pass
+
+
+def _timeout_handler(signum, frame):
+    raise FunctionTimeout()
+
+
+def test_wrapper(func, collect_fail=True, pass_args=True):
     def patched(*args, **kwargs):
         collector = debugger.collector_class()
+        signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(TEST_TIMEOUT)
         try:
-            with collector:
-                func(*args, **kwargs)
+            if pass_args:
+                with collector:
+                    ret = func(*args, **kwargs)
+            else:
+                with collector:
+                    ret = func()
+            signal.alarm(0)
             debugger.add_collector(debugger.PASS, collector)
+            return ret
         except Exception as e:
+            signal.alarm(0)
             if collect_fail:
                 debugger.add_collector(debugger.FAIL, collector)
             raise e
-
-    setattr(patched, "patched_flag", True)
-    return patched
-
-
-def unittest_wrapper(func, collect_fail=True):
-    def patched(*args, **kwargs):
-        collector = debugger.collector_class()
-        try:
-            with collector:
-                func()
-            debugger.add_collector(debugger.PASS, collector)
-        except Exception as e:
-            if collect_fail:
-                debugger.add_collector(debugger.FAIL, collector)
-            raise e
+        finally:
+            signal.alarm(0)
 
     setattr(patched, "patched_flag", True)
     return patched
@@ -45,7 +51,7 @@ class TestCase(TestCase):
     def add_wrapper(self, name):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
-            setattr(self, name, types.MethodType(unittest_wrapper(func), self))
+            setattr(self, name, types.MethodType(test_wrapper(func, True, False), self))
 
     def __init__(self, *args, **kwargs):
         reference = super()
@@ -58,9 +64,8 @@ class TestCase(TestCase):
 
 def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
-        item.obj = pytest_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)
+        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)
 
 
 def pytest_sessionfinish(session, exitstatus):
     debugger.teardown()
-

@@ -78,7 +78,7 @@ fi
 ln -s "${framework_location}/../py/TestWrapper" "${work_dir}/TestWrapper"
 echo "Created Symlink ${work_dir}/TestWrapper -> ${framework_location}/../py/TestWrapper"
 
-ln -s "$(dirname "${work_dir}")" "${work_dir}/TestWrapper/work_dir.info"
+dirname "${work_dir}" > "${work_dir}/TestWrapper/work_dir.info"
 
 wrapper_class="$(readlink -f "$(dirname "${wrapper_class}")")/$(basename "${wrapper_class}")"
 ln -s "${wrapper_class}" "${work_dir}/WrapClass.py"

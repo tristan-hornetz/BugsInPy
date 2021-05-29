@@ -205,5 +205,7 @@ if [[ -e "$project_location/bugs/$bug_id/setup.sh" ]]; then
    cp -f "$project_location/bugs/$bug_id/setup.sh" "$work_dir/$project_name/bugsinpy_setup.sh"
 fi
 
+(echo "PROJECT_NAME=$project_name"; echo "BUG_ID=$bug_id"; echo "VERSION_ID=$version_id"; echo "WORK_DIR=$work_dir") > "$work_dir/$project_name/bugsinpy_id.info"
+
 
 

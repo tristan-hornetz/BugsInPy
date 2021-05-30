@@ -147,13 +147,12 @@ if [[ -f "$work_dir/bugsinpy_setup.sh" ]]; then
 fi
 IFS=';' read -r -a run_setup <<< "$run_setup_all"
 
-if [[ $env_present == "0" ]]; then
-  ###Install requirement
-  #pip install -r "$work_dir/bugsinpy_requirements.txt"
-  if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
-      cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
-  fi
+###Install requirement
+#pip install -r "$work_dir/bugsinpy_requirements.txt"
+if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
+    cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
 fi
+
 
 for index in "${!run_setup[@]}"
 do

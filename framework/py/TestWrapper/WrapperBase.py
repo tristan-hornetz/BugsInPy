@@ -52,7 +52,7 @@ class TestCase(TestCase):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
             ref_name = f"{func.__module__}.{self.__class__.__name__}.{func.__name__}"
-            setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name), False), self))
+            setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name) or test_id == "", False), self))
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
@@ -67,7 +67,7 @@ class TestCase(TestCase):
 
 def pytest_runtest_setup(item):
     if item.obj.__name__ != "patched":
-        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] == test_id)
+        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] == test_id or test_id == "")
 
 
 def pytest_sessionfinish(session, exitstatus):

@@ -93,6 +93,7 @@ done < "$work_dir/bugsinpy_bug.info"
 ###Initialize pyenv
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+pyenv deactivate
 
 
 ###Install required python version if not already installed

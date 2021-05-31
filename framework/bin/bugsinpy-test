@@ -62,6 +62,7 @@ fi
 ###Initialize pyenv
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+pyenv deactivate
 
 
 ###Read bug.info file

@@ -41,4 +41,4 @@ class DefaultWrapperClass(RankDumper):
 
 
 debugger = DefaultWrapperClass()
-test_id = ""
+test_ids = []

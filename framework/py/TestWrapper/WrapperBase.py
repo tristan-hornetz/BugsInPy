@@ -3,7 +3,7 @@ from unittest import *
 import signal
 import sys
 
-from WrapClass import debugger, test_id
+from WrapClass import debugger, test_ids
 
 TEST_TIMEOUT = 15  # seconds
 
@@ -52,7 +52,10 @@ class TestCase(TestCase):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
             ref_name = f"{func.__module__}.{self.__class__.__name__}.{func.__name__}"
-            setattr(self, name, types.MethodType(test_wrapper(func, str(test_id).endswith(ref_name) or test_id == "", False), self))
+            collect_failure = len(test_ids) == 0
+            for test_id in test_ids:
+                collect_failure = collect_failure or str(test_id).endswith(ref_name)
+            setattr(self, name, types.MethodType(test_wrapper(func,  collect_failure, False), self))
 
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
@@ -67,7 +70,7 @@ class TestCase(TestCase):
 
 def pytest_runtest_call(item):
     if item.obj.__name__ != "patched":
-        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] == test_id or test_id == "")
+        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] in test_ids or len(test_ids) == 0)
 
 
 def pytest_sessionfinish(session, exitstatus):

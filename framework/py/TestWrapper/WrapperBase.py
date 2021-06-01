@@ -65,10 +65,12 @@ class TestCase(TestCase):
         return obj
 
 
-def pytest_runtest_setup(item):
+def pytest_runtest_call(item):
     if item.obj.__name__ != "patched":
         item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] == test_id or test_id == "")
 
 
 def pytest_sessionfinish(session, exitstatus):
-    debugger.teardown()
+    if not hasattr(debugger, "teardown_successful"):
+        debugger.teardown()
+        setattr(debugger, "teardown_successful", True)

@@ -105,12 +105,12 @@ if [[ $pytest == "1" ]]; then
   do
     line_arr=($line)
     if [[ $line == *"/conftest.py" ]]; then
-      echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_setup, pytest_sessionfinish\n' >> "${line_arr[1]}"
+      echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_call, pytest_sessionfinish\n' >> "${line_arr[1]}"
       echo "Instrumented ${line_arr[1]}"
     else
       dname=$(dirname "${line_arr[1]}")
       if [ ! -f "$dname/conftest.py" ]; then
-        echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_setup, pytest_sessionfinish\n' >> "$dname/conftest.py"
+        echo $'\nfrom TestWrapper.WrapperBase import pytest_runtest_call, pytest_sessionfinish\n' >> "$dname/conftest.py"
         echo "Created ${dname}/conftest.py"
       fi
       if [ ! -L "$dname/TestWrapper" ]; then

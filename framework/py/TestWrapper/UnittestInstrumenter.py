@@ -17,22 +17,18 @@ class InputTransformer(Transformer):
 
     def visit_Import(self, node: Import) -> Any:
         names = list(((n.name, n.asname) for n in node.names))
-        for (n, asn) in names:
-            if UNITTEST == n.split('.')[0]:
+        for n, asn in names:
+            if UNITTEST == n:
                 old_aliases = list(filter(lambda e: UNITTEST != e.name.split('.')[0], node.names))
-                if asn:
-                    unittest_alias = alias(name=n.replace(UNITTEST, WRAPPER_BASE), asname=asn)
-                else:
-                    unittest_alias = alias(name=WRAPPER_BASE, asname=UNITTEST)
+                unittest_alias = alias(name=n.replace(UNITTEST, WRAPPER_BASE), asname=asn if asn else UNITTEST)
                 self.modified = True
                 return Import(old_aliases + [unittest_alias])
         return node
 
     def visit_ImportFrom(self, node: ImportFrom) -> Any:
-        if node.module.split('.')[0] == UNITTEST:
-            module_name = node.module.replace(UNITTEST, WRAPPER_BASE)
+        if node.module == UNITTEST:
             self.modified = True
-            return ImportFrom(module_name, node.names, node.level)
+            return ImportFrom(WRAPPER_BASE, node.names, node.level)
         return node
 
 

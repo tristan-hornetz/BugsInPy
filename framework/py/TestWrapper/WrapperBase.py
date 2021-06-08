@@ -16,6 +16,17 @@ def _timeout_handler(signum, frame):
     raise FunctionTimeout()
 
 
+def pytest_item_id_matches(node_id: str):
+    item_name = node_id.split("[")[0]
+    if item_name in test_ids:
+        return True
+    if item_name.replace("::()", "") in test_ids:
+        return True
+    if item_name.replace("()", "") in test_ids:
+        return True
+    return False
+
+
 def test_wrapper(func, collect_fail=True, pass_args=True):
     def patched(*args, **kwargs):
         collector = debugger.collector_class()
@@ -70,7 +81,7 @@ class TestCase(TestCase):
 
 def pytest_runtest_call(item):
     if item.obj.__name__ != "patched":
-        item.obj = test_wrapper(item.obj, item.nodeid.split("[")[0] in test_ids or len(test_ids) == 0)
+        item.obj = test_wrapper(item.obj, pytest_item_id_matches(item.nodeid) or len(test_ids) == 0)
 
 
 def pytest_sessionfinish(session, exitstatus):

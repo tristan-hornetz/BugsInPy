@@ -62,8 +62,10 @@ elif [[ ! -e "$work_dir/bugsinpy_run_test.sh" ]]; then
 fi
 
 if [[ ! -e "$work_dir/bugsinpy_compile_flag" ]]; then
+  if [[ $force != "1" ]]; then
    echo "You have not compiled this project"
    exit
+  fi
 fi
 if [[ -e "$work_dir/bugsinpy_instrument_flag" ]]; then
   if [[ $force != "1" ]]; then

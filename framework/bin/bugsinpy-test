@@ -130,10 +130,8 @@ if [[ "$run_all" == "0" && "$single_test" == "" ]]; then
 
 elif [[ "$run_all" == "1" ]]; then
   if [[ "$pytest" == "1" ]]; then
-     res_first=$(pytest --continue-on-collection-errors 2>&1)
-     echo "$res_first"
      echo "pytest --continue-on-collection-errors" &>>"$work_dir/bugsinpy_alltest.txt"
-     echo "$res_first" &>>"$work_dir/bugsinpy_alltest.txt"
+     pytest --continue-on-collection-errors 2>&1
   else
      echo "Run Unittest" 
      ###Read bug.info file
@@ -173,11 +171,9 @@ elif [[ "$run_all" == "1" ]]; then
 
      echo "$access_test"
      echo "python -m unittest discover $access_test"
-     res_first=$(python -m unittest discover $access_test 2>&1)
+     python -m unittest discover $access_test 2>&1
      #python -m unittest
-     echo "$res_first"
      echo "python -m unittest discover $access_test" &>>"$work_dir/bugsinpy_alltest.txt"
-     echo "$res_first" &>>"$work_dir/bugsinpy_alltest.txt"
 
   fi
 

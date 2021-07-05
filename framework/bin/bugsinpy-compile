@@ -100,7 +100,7 @@ done < "$work_dir/bugsinpy_bug.info"
 
 shasum_output=$(sha1sum "$work_dir/bugsinpy_requirements.txt")
 shas_split=($shasum_output)
-requirement_hash=${shasum_output[0]}
+requirement_hash=${shas_split[0]}
 
 ###Initialize pyenv
 eval "$(pyenv init -)"

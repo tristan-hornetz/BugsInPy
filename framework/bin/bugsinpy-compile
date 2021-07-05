@@ -1,7 +1,12 @@
 #!/bin/bash
-usage="-w work_dir
+usage="
+       -w work_dir
              The working directory to compile the project. Default will be the current directory.
+       -r remove_env
+             The existing environment will be completely removed and reinstalled
 "
+
+remove_env="0"
 
 case $1 in
  -[h?] | --help)
@@ -10,6 +15,7 @@ case $1 in
         $usage
 ____HALP
         exit 0;;
+ -r) remove_env="1";;
 esac
 
 ###Read the flag of checkout
@@ -156,8 +162,10 @@ IFS=';' read -r -a run_setup <<< "$run_setup_all"
 
 ###Install requirement
 #pip install -r "$work_dir/bugsinpy_requirements.txt"
-if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
-    cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
+if [ $remove_env == "0" ] && [ $env_present == "1" ]; then
+  if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
+      cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
+  fi
 fi
 
 

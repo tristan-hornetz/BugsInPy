@@ -57,6 +57,8 @@ buggy_commit=""
 fix_commit=""
 python_version=""
 
+requirement_hash="no_requirements"
+
 ###Read bug.info file
 DONE=false
 until $DONE ;do
@@ -90,6 +92,10 @@ elif [[ "$REPLY" == "pythonpath"* ]]; then
 fi
 done < "$work_dir/bugsinpy_bug.info"
 
+shasum_output=$(sha1sum "$work_dir/bugsinpy_requirements.txt")
+shas_split=($shasum_output)
+requirement_hash=${shasum_output[0]}
+
 ###Initialize pyenv
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
@@ -114,7 +120,7 @@ fi
 
 ###Remove old environments
 env_present="0"
-env_name="_bugsinpy_${python_version}_${buggy_commit}"
+env_name="_bugsinpy_${python_version}_${requirement_hash}"
 while read -r line
 do
   if [[ $line == "${env_name}"* ]]; then

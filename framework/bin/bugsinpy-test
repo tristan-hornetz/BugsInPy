@@ -79,8 +79,13 @@ elif [[ "$REPLY" == "python_version"* ]]; then
 fi
 done < "$work_dir/bugsinpy_bug.info"
 
+
+shasum_output=$(sha1sum "$work_dir/bugsinpy_requirements.txt")
+shas_split=($shasum_output)
+requirement_hash=${shasum_output[0]}
+
 ###Activate environment
-env_name="_bugsinpy_${python_version}_${buggy_commit}"
+env_name="_bugsinpy_${python_version}_${requirement_hash}"
 pyenv activate $env_name
 
 cd "$work_dir"

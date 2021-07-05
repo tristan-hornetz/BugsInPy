@@ -162,7 +162,7 @@ IFS=';' read -r -a run_setup <<< "$run_setup_all"
 
 ###Install requirement
 #pip install -r "$work_dir/bugsinpy_requirements.txt"
-if [ $remove_env == "0" ] && [ $env_present == "1" ]; then
+if [ $remove_env == "1" ] || [ $env_present == "0" ]; then
   if grep -q '[^[:space:]]' "$work_dir/bugsinpy_requirements.txt"; then
       cat "$work_dir/bugsinpy_requirements.txt" | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
   fi

@@ -5,7 +5,7 @@ import sys
 
 from WrapClass import debugger, test_ids
 
-TEST_TIMEOUT = 15  # seconds
+TEST_TIMEOUT = 45  # seconds
 
 
 class FunctionTimeout(Exception):

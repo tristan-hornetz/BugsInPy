@@ -124,7 +124,7 @@ if [[ $pytest == "1" ]]; then
         echo "Created Symlink ${dname}/WrapClass.py -> ${wrapper_class}"
       fi
     fi
-  done < <(du -a | grep ".*/test_.*py$\|.*_test.py$\|.*/conftest.py$")
+  done < <(du -a | grep ".*/tests_.*py$\|.*/test_.*py$\|.*_test.py$\|.*/conftest.py$")
 else
   echo "Python Unittest detected"
   ### Instrument test files

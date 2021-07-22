@@ -1,3 +1,5 @@
+#!/bin/bash
+
 usage="-w work_dir
              The working directory to run the test. Default will be the current directory.
 "

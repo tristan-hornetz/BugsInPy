@@ -1,7 +1,8 @@
 import types
 from unittest import *
 import signal
-import sys
+import subprocess
+import os
 
 from WrapClass import debugger, test_ids
 
@@ -13,6 +14,10 @@ class FunctionTimeout(Exception):
 
 
 def _timeout_handler(signum, frame):
+    sp = subprocess.Popen(['ps', '-opid', '--no-headers', '--ppid', str(os.getpid())], encoding='utf8')
+    child_process_ids = [int(line) for line in sp.stdout.read().splitlines()]
+    for child in child_process_ids:
+        os.kill(child, signal.SIGTERM)
     raise FunctionTimeout()
 
 

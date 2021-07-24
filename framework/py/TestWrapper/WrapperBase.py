@@ -1,5 +1,7 @@
 import types
 from unittest import *
+import types
+from unittest import *
 import signal
 import subprocess
 import os
@@ -18,6 +20,7 @@ def _timeout_handler(signum, frame):
     child_process_ids = [int(line) for line in sp.stdout.read().splitlines()]
     for child in child_process_ids:
         os.kill(child, signal.SIGTERM)
+    signal.alarm(5)
     raise FunctionTimeout()
 
 
@@ -36,7 +39,8 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
     def patched(*args, **kwargs):
         collector = debugger.collector_class()
         signal.signal(signal.SIGALRM, _timeout_handler)
-        signal.alarm(TEST_TIMEOUT)
+        signal.signal(signal.SIGINT, _timeout_handler)
+        signal.alarm(TEST_TIMEOUT * (10 if collect_fail else 1))
         try:
             if pass_args:
                 with collector:
@@ -48,12 +52,9 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
             debugger.add_collector(debugger.PASS, collector)
             return ret
         except Exception as e:
-            signal.alarm(0)
             if collect_fail and not isinstance(e, FunctionTimeout):
                 debugger.add_collector(debugger.FAIL, collector)
             raise e
-        finally:
-            signal.alarm(0)
 
     setattr(patched, "patched_flag", True)
     return patched
@@ -90,6 +91,7 @@ def pytest_runtest_call(item):
 
 
 def pytest_sessionfinish(session, exitstatus):
+    signal.alarm(0)
     if not hasattr(debugger, "teardown_successful"):
         debugger.teardown()
         setattr(debugger, "teardown_successful", True)

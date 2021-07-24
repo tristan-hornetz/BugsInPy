@@ -9,6 +9,7 @@ import os
 from WrapClass import debugger, test_ids
 
 TEST_TIMEOUT = 45  # seconds
+FAIL_TIMEOUT_INCREASE_FACTOR = 10
 
 
 class FunctionTimeout(Exception):
@@ -40,7 +41,7 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
         collector = debugger.collector_class()
         signal.signal(signal.SIGALRM, _timeout_handler)
         signal.signal(signal.SIGINT, _timeout_handler)
-        signal.alarm(TEST_TIMEOUT * (10 if collect_fail else 1))
+        signal.alarm(TEST_TIMEOUT * (FAIL_TIMEOUT_INCREASE_FACTOR if collect_fail else 1))
         try:
             if pass_args:
                 with collector:

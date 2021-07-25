@@ -1,15 +1,15 @@
 import types
 from unittest import *
-import types
-from unittest import *
 import signal
 import subprocess
 import os
 
 from WrapClass import debugger, test_ids
 
+if hasattr(debugger, "extracted_test_ids"):
+    debugger.extracted_test_ids = test_ids
+
 TEST_TIMEOUT = 45  # seconds
-FAIL_TIMEOUT_INCREASE_FACTOR = 10
 
 
 class FunctionTimeout(Exception):
@@ -41,7 +41,7 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
         collector = debugger.collector_class()
         signal.signal(signal.SIGALRM, _timeout_handler)
         signal.signal(signal.SIGINT, _timeout_handler)
-        signal.alarm(TEST_TIMEOUT * (FAIL_TIMEOUT_INCREASE_FACTOR if collect_fail else 1))
+        signal.alarm(TEST_TIMEOUT * (10 if collect_fail else 1))
         try:
             if pass_args:
                 with collector:
@@ -53,9 +53,12 @@ def test_wrapper(func, collect_fail=True, pass_args=True):
             debugger.add_collector(debugger.PASS, collector)
             return ret
         except Exception as e:
+            #signal.alarm(0)
             if collect_fail and not isinstance(e, FunctionTimeout):
                 debugger.add_collector(debugger.FAIL, collector)
             raise e
+        #finally:
+        #    signal.alarm(0)
 
     setattr(patched, "patched_flag", True)
     return patched
@@ -70,6 +73,8 @@ class TestCase(TestCase):
         func = getattr(self, name)
         if not hasattr(func, "patched_flag"):
             ref_name = f"{func.__module__}.{self.__class__.__name__}.{func.__name__}"
+            if hasattr(debugger, "covered_test_ids"):
+                debugger.covered_test_ids.append(ref_name)
             collect_failure = len(test_ids) == 0
             for test_id in test_ids:
                 collect_failure = collect_failure or str(test_id).endswith(ref_name)
@@ -88,6 +93,8 @@ class TestCase(TestCase):
 
 def pytest_runtest_call(item):
     if item.obj.__name__ != "patched":
+        if hasattr(debugger, "covered_test_ids"):
+            debugger.covered_test_ids.append(item.nodeid)
         item.obj = test_wrapper(item.obj, pytest_item_id_matches(item.nodeid) or len(test_ids) == 0)
 
 

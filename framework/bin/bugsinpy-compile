@@ -103,6 +103,7 @@ shas_split=($shasum_output)
 requirement_hash=${shas_split[0]}
 
 ###Initialize pyenv
+eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 pyenv deactivate

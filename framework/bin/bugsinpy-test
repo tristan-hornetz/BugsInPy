@@ -60,6 +60,7 @@ if [[ "$relevant" == "1" ]]; then
 fi
 
 ###Initialize pyenv
+eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 pyenv deactivate

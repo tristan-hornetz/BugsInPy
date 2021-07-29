@@ -1,4 +1,4 @@
 
-pip install test_requirements.txt
+pip install -r test_requirements.txt
 pytest
 

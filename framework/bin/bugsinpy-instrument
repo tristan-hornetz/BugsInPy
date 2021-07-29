@@ -94,7 +94,7 @@ DONE=false
 until $DONE ;do
 read || DONE=true
 if [ "$REPLY" != "" ]; then
-   if [[ "$REPLY" == *"pytest"* || "$REPLY" == *"py.test"* ]]; then
+   if [[ "$REPLY" == *"pytest"* || "$REPLY" == *"py.test"* || "$REPLY" == *"tox "* ]]; then
        pytest="1"
    fi
 fi

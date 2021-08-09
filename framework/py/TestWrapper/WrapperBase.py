@@ -9,7 +9,7 @@ from WrapClass import debugger, test_ids
 if hasattr(debugger, "extracted_test_ids"):
     debugger.extracted_test_ids = test_ids
 
-TEST_TIMEOUT = 60  # seconds
+TEST_TIMEOUT = 180  # seconds
 
 
 class FunctionTimeout(Exception):

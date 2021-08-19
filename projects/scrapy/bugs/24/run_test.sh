@@ -1,1 +1,2 @@
-python -m unittest -q tests.test_downloader_handlers.HttpProxyTestCase.test_download_with_proxy_https_timeout
+pytest tests/test_downloader_handlers.py::HttpProxyTestCase::test_download_with_proxy_https_timeout
+pytest tests/test_downloader_handlers.py::HttpProxyTestCase

@@ -1,2 +1,4 @@
-python -m unittest -q tests.test_downloadermiddleware_redirect.RedirectMiddlewareTest.test_latin1_location
-python -m unittest -q tests.test_downloadermiddleware_redirect.RedirectMiddlewareTest.test_utf8_location
+pytest tests/test_downloadermiddleware_redirect.py::RedirectMiddlewareTest::test_latin1_location
+pytest tests/test_downloadermiddleware_redirect.py::RedirectMiddlewareTest
+pytest tests/test_downloadermiddleware_redirect.py::RedirectMiddlewareTest::test_utf8_location
+pytest tests/test_downloadermiddleware_redirect.py::RedirectMiddlewareTest

@@ -1,3 +1,6 @@
+# Keys from https://github.com/scrapy/scrapy/
+# Commit 756c368a6b0d2eef65f86f8418f9a7fbeff036c7
+
 mitm_ca="-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCYp6U4G9YWITYB
 /JlZ+Hd08c/9a157WVl03hbR2DSK8FnK+D8cp2dGzuTfC08w8M/yvVYPcbb7ZDiT
@@ -115,4 +118,7 @@ Vq4BG021fJ9nlHRtr4rotpgHDX1rr+iWeHKsx4+5DRSy
 echo "${mitm_ca}" > tests/keys/mitmproxy-ca.pem
 echo "${cert}" > tests/keys/cert.pem
 
-python -m unittest discover tests/
+pip install pytest==5.0.1 pytest-xdist==1.21
+rm pytest.ini
+pytest --continue-on-collection-errors tests
+

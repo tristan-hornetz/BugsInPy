@@ -1,1 +1,2 @@
-python -m unittest -q tests.test_utils_response.ResponseUtilsTest.test_response_status_message
+pytest tests/test_utils_response.py::ResponseUtilsTest::test_response_status_message
+pytest tests/test_utils_response.py::ResponseUtilsTest

@@ -1,1 +1,2 @@
-python -m unittest -q tests.test_pipeline_images.ImagesPipelineTestCaseCustomSettings
+pytest tests/test_pipeline_images.py::ImagesPipelineTestCaseCustomSettings
+pytest tests/test_pipeline_images.py

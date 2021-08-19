@@ -1,2 +1,4 @@
-python -m unittest -q tests.test_spidermiddleware_offsite.TestOffsiteMiddleware4._get_spiderargs
-python -m unittest -q tests.test_spidermiddleware_offsite.TestOffsiteMiddleware4.test_process_spider_output
+pytest tests/test_spidermiddleware_offsite.py::TestOffsiteMiddleware4::_get_spiderargs
+pytest tests/test_spidermiddleware_offsite.py::TestOffsiteMiddleware4
+pytest tests/test_spidermiddleware_offsite.py::TestOffsiteMiddleware4::test_process_spider_output
+pytest tests/test_spidermiddleware_offsite.py::TestOffsiteMiddleware4

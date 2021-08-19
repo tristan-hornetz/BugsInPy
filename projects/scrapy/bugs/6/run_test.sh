@@ -1,1 +1,2 @@
-python -m unittest -q tests.test_pipeline_images.ImagesPipelineTestCase.test_convert_image
+pytest tests/test_pipeline_images.py::ImagesPipelineTestCase::test_convert_image
+pytest tests/test_pipeline_images.py::ImagesPipelineTestCase

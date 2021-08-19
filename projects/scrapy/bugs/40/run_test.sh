@@ -1,1 +1,2 @@
-python -m unittest -q tests.test_exporters.PythonItemExporterTest.test_other_python_types_item
+pytest tests/test_exporters.py::PythonItemExporterTest::test_other_python_types_item
+pytest tests/test_exporters.py::PythonItemExporterTest

@@ -118,7 +118,7 @@ Vq4BG021fJ9nlHRtr4rotpgHDX1rr+iWeHKsx4+5DRSy
 echo "${mitm_ca}" > tests/keys/mitmproxy-ca.pem
 echo "${cert}" > tests/keys/cert.pem
 
-pip install pytest==5.0.1 pytest-xdist==1.21
+pip uninstall pytest pytest-xdist --yes
+pip install pytest pytest-xdist
 rm pytest.ini
-pytest --continue-on-collection-errors tests
-
+pytest -n 8

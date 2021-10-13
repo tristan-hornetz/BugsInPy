@@ -8,4 +8,6 @@ do
   ln -s "$(readlink -f "${line_arr[1]}")" "$fdname/test_$bname"
 done < <(du -a | grep ".*/tests_.*py$")
 
+ln -s $(readlink -f ./tqdm) ./tqdm/tests/tqdm
+
 pytest

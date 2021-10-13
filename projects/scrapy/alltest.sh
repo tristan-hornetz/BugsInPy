@@ -118,7 +118,9 @@ Vq4BG021fJ9nlHRtr4rotpgHDX1rr+iWeHKsx4+5DRSy
 echo "${mitm_ca}" > tests/keys/mitmproxy-ca.pem
 echo "${cert}" > tests/keys/cert.pem
 
+pip install -r requirements-py3.txt
 pip uninstall pytest pytest-xdist --yes
 pip install pytest pytest-xdist
 rm pytest.ini
-pytest -n 8
+touch tests/py3-ignores.txt
+pytest -n 8 tests $(python TestWrapper/get_failing_test_ids.py) --ignore-glob=*TestWrapper*

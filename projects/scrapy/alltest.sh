@@ -119,6 +119,7 @@ echo "${mitm_ca}" > tests/keys/mitmproxy-ca.pem
 echo "${cert}" > tests/keys/cert.pem
 
 pip install -r requirements-py3.txt
+pip install -r tests/requirements-py3.txt
 pip uninstall pytest pytest-xdist --yes
 pip install pytest pytest-xdist
 rm pytest.ini

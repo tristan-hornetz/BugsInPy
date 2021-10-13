@@ -26,7 +26,7 @@ def _timeout_handler(signum, frame):
 
 
 def pytest_item_id_matches(node_id: str):
-    item_name = node_id.split("[")[0]
+    item_name = node_id.split("[")[0].split(" ")[0]
     if item_name in test_ids:
         return True
     if item_name.replace("::()", "") in test_ids:

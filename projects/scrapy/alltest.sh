@@ -124,4 +124,4 @@ pip uninstall pytest pytest-xdist --yes
 pip install pytest pytest-xdist
 rm pytest.ini
 touch tests/py3-ignores.txt
-pytest -n 8 tests $(python TestWrapper/get_failing_test_ids.py) --ignore-glob=*TestWrapper*
+pytest -n 8 tests --ignore-glob=*TestWrapper*

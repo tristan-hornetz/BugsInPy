@@ -14,4 +14,4 @@ fi
 done < "_temp.txt"
 rm _temp.txt
 rm -f keras/utils/conftest.py
-pytest
+pytest -n 8 tests $(python TestWrapper/get_failing_test_ids.py) --ignore-glob=*TestWrapper*

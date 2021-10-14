@@ -120,8 +120,8 @@ echo "${cert}" > tests/keys/cert.pem
 
 pip install -r requirements-py3.txt
 pip install -r tests/requirements-py3.txt
-pip uninstall pytest pytest-xdist --yes
-pip install pytest pytest-xdist
+pip uninstall pytest pytest-xdist pytest-cov --yes
+pip install pytest pytest-xdist pytest-cov
 rm pytest.ini
 touch tests/py3-ignores.txt
-pytest -n 8 tests --ignore-glob=*TestWrapper*
+pytest -n 8 tests $(python TestWrapper/get_failing_test_ids.py) --ignore-glob=*TestWrapper*

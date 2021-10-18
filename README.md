@@ -2,6 +2,9 @@
 BugsInPy: A Database of Existing Bugs in Python Programs to Enable Controlled Testing and Debugging Studies.
 The objective of this work is to support reproducible research on real-world Python projects. 
 
+This fork of BugsInPy was modified to fulfill the needs of [SD-SBFL](https://github.com/tristan-hornetz/SD-SBFL).
+
+
 # Steps to set up BugsInPy
 1. Clone BugsInPy:
     - `git clone https://github.com/soarsmu/BugsInPy`
